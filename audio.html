@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://unpkg.com/wavesurfer.js"></script>
+    </head>
+    <body>
+        <a style='font-size:20px; color:darkblue'>Upload a file below:</a>
+        <form style='margin-top:20px' enctype="multipart/form-data" action='/upload' method='POST'>
+            <input type='file' name='upload'>
+            <button type="submit">Please to upload sir.</button>
+        </form>
+        <figure>
+            <audio controls src="/static/kyle.m4a"></audio>
+        </figure>
+        <div id="waveform" style='width:200px;'>
+
+        </div>
+        <button onclick=wavesurfer.play()>
+            Play!
+        </button>
+        <button onclick=wavesurfer.pause()>
+            Pause
+        </button>
+        <script>
+
+        var wavesurfer = WaveSurfer.create({
+                            container: '#waveform',
+                            barWidth: 2,
+                            barHeight: 1,
+                            waveColor: 'gray',
+                            progressColor: 'purple',
+                            scrollParent: true,
+                        });
+            wavesurfer.load('/static/kyle.m4a');
+        </script>
+    </body>
+</html>

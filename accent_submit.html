@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Accent Classifier</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- <link href="/static/layout.css" rel="stylesheet" type="text/css" media="all"> -->
+  <script src="https://unpkg.com/wavesurfer.js"></script>
+  <style>
+
+    a { 
+      text-decoration: none;
+      color: #2f2f2f;  
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: 38px;
+    }
+  
+    #mu-hero {
+      float: left;
+      padding: 50px 0 90px;
+      width: 100%;
+    }
+
+    .row {
+      padding-left: 5%;
+      padding-right: 5%;
+    }
+    #left {
+      padding-right: 3%;
+      float: left;
+      width: 47%;
+    }
+
+    #right {
+      padding-left: 3%;
+      float: left;
+      width: 47%;
+    }
+
+    p {
+      text-align: justify;
+    }
+
+    html{overflow-y:scroll; overflow-x:hidden;}
+    html, body{margin:0; padding:0; font-size:14px; line-height:1.6em;}
+
+    .flex-container a:hover, .flex-slider a:hover{outline:none;}
+    .slides, .slides > li, .flex-control-nav, .flex-direction-nav{margin:0; padding:0; list-style:none;}
+    .flex-direction-nav a{font-family:"FontAwesome";}
+
+
+    /* Necessary Styles
+    --------------------------------------------------------------------------------------------------------------- */
+    .flexslider{display:block; position:relative; margin:0; padding:0;}
+    .flexslider .slides{display:block; width:100%; overflow:hidden;}
+    .flexslider .slides > li{display:none; -webkit-backface-visibility:hidden;}/* Hide the slides before the JS is loaded. Avoids image jumping */
+    .flexslider .slides a{text-decoration:none; outline:none;}
+    .flexslider .slides a img{border:none;}
+    .flexslider .slides img{display:block; max-width:100%; margin:0 auto;}
+    /* Modern Clear fix for the .slides element */
+    .slides::before, .slides::after{display:table; content:"";}
+    .slides, .slides::after{clear:both;}
+
+
+    /* Default Theme
+    --------------------------------------------------------------------------------------------------------------- */
+    .flex-viewport{max-height:2000px; transition:all 1s ease;}
+    .loading .flex-viewport{max-height:300px;}
+    .flexslider.carousel .slides li{margin-right:20px;}/* Must be the same as in the javascript */
+
+    /* Direction Nav */
+    .flex-direction-nav{}
+    .flex-direction-nav a{display:block; position:absolute; top:50%; width:40px; height:40px; margin:-20px 0 0 0; z-index:10; overflow:hidden; opacity:0; cursor:pointer; text-decoration:none;}
+    .flex-direction-nav a::before{display:inline-block; font-size:40px; line-height:1; content:"\f053"; z-index:999;}
+    .flex-direction-nav a.flex-next::before{content:"\f054";}
+    .flex-direction-nav .flex-prev{left:0;}
+    .flex-direction-nav .flex-next{right:0;}
+    .flexslider:hover .flex-prev, .flexslider:hover .flex-next{opacity:.5;}
+    .flexslider:hover .flex-prev:hover, .flexslider:hover .flex-next:hover{opacity:1;}
+    .flex-direction-nav .flex-disabled{visibility:hidden; opacity:0; cursor:default; z-index:-1;}
+
+    /* Control Nav */
+    .flex-control-nav{display:block; position:absolute; bottom:-80px; width:100%; text-align:center;}
+    .flex-control-nav li{display:inline-block; margin:0 5px;}
+    .flex-control-paging li a{display:block; width:11px; height:11px; cursor:pointer; text-indent:-9999px; border:2px solid; border-radius:20px;}
+    .flex-control-paging li a.flex-active{cursor:default;}
+
+
+
+    /* Colours
+    --------------------------------------------------------------------------------------------------------------- */
+    .flex-direction-nav a{color:rgba(255,255,255,1);}
+    .flex-control-paging li a{background-color:rgba(255,255,255,1); border-color:rgba(255,255,255,0);}
+    .flex-control-paging li a.flex-active{background-color:rgba(255,255,255,0); border-color:rgba(255,255,255,1);}
+
+    #pageintro{padding:100px 0;}
+
+    #pageintro li article{display:block; max-width:75%; margin:0 auto; text-align:center;}
+    #pageintro li article *{margin:0;}
+    #pageintro li p:first-of-type{margin-bottom:10px;}
+    #pageintro li .heading{margin-bottom:30px; font-size:3rem; word-wrap:break-word;}
+    #pageintro li p:nth-of-type(2){line-height:1.5rem;}
+    #pageintro li footer{margin-top:40px;}
+
+    .overlay{color:#FFFFFF; background-color:inherit;}
+    .overlay::after{color:inherit; background-color:rgba(0,0,0,.20);}
+    .overlay.light{color:#474747;}
+    .overlay.light::after{background-color:rgba(255,255,255,.9);}
+    .overlay{position:relative; z-index:1;}
+    .overlay::after{display:block; position:absolute; top:0; left:0; width:100%; height:100%; content:""; z-index:-1;}
+    .bgded{background-position:top center; background-repeat:no-repeat; background-size:cover;}
+  </style>
+
+</head>
+
+<body id="top">
+    <div class="bgded overlay" style="background-color: orangered;">  
+        <div id="pageintro" class="hoc clear"> 
+          <div class="flexslider basicslider">
+            <ul class="slides">
+              <li>
+                <article>
+                  <p></p>
+                  <h1 class="heading" style='font-size:50px;text-shadow: 1px 1px black'>English Around the World</h1>
+                  <p style='font-size:20px;'>
+                    While English is the current global language, it is spoken in many different parts of the world. Because of the 
+                    diversity of people that speak the language, there is also a breadth of different accents that have developed over 
+                    time. Using the Wildcat Speech Accent Archive, we analyze the components of accents and classify these among 6 different countries.
+                     To check the components of your accent, upload a file below!
+                  </p>
+                  <!-- <footer><a class="btn" href="#">I am dog</a></footer> -->
+                </article>
+              </li>
+    
+              <li>
+                <article>
+                  <p></p>
+                  <h1 class="heading" style='font-size:50px;'>The Dataset</h1>
+                  <p style='font-size: 20px;'>
+                    The wildcat corpus speech accent archive is a repository of sound files hosted by George Mason University
+                    in the United States. The goal of the site is to gather data on accents from different people around the world
+                    in order to further and advance the study of accents and their implications. The corpus contains both native and 
+                    non-native English speakers, with over 2,000+ audio files with complete information on the background of each 
+                    speaker, as well as partial transcripts of the audio file. There is also a subset of the data that has each speaker 
+                    speak a single sentence across different samples; this can be very helpful for researchers who would otherwise not 
+                    have access to a standardized audio recording accross different accents.
+                  </p>
+                  <footer><a href="https://accent.gmu.edu"><button>Visit the website!</button></a></footer>
+                </article>
+              </li>
+    
+              <li>
+                <article>
+                  <p></p>
+                  <h1 class="heading" style='font-size:50px;'>The Study</h1>
+                  <p style='font-size:20px;'>
+                  This study uses 10,620 samples generated from 180 original files. Each of these files are split into several second-long 
+                  intervals, that are converted into their mel-frequency cepstral coefficients (MFCCs) across 40 MFCC bands. The MFCC conversion 
+                  ensures that the data is presented in a log-scale, in order to mimic as closely as possible the natural hearing of humans. In 
+                  analyzing the data, an Extreme Gradient Boosting Tree Classifier (XGBoost Classifier) is implemented in the identification of the different accents. 
+                  The dataset has 6 possible labels: American, British, Australian, Chinese, Korean, and Irish; these correspond to the native 
+                  language of the original speaker who spoke the ellicitation phrase from the study. The current model performs with 
+                  61.5% accuracy at predicting the 6 labels.
+                  </p>
+                </article>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    
+      <div class="wrapper row3">
+
+    <!-- for the second section. please edit -->
+
+  <section id="mu-hero">
+    <div class="container">
+      <div class='row'>
+        <div id='left'>
+          <h1>Breaking down your accent</h1>
+          <p>While English is the current global language, it is spoken in many different parts of the world. Because of the 
+            diversity of people that speak the language, there is also a breadth of different accents that have developed over 
+            time. Using the Wildcat Speech Accent Archive, we analyze the components of accents and classify these among 6 different countries.
+             To check the components of your accent, upload a file below!
+            <br>
+            <br>
+            In line with the study, please speak the following phrase below:
+            <p style='font-style: italic'>"Please call Stella.  Ask her to bring these things with her from the store:  Six spoons of fresh snow peas, five thick slabs of blue cheese, and maybe a snack for her brother Bob.  We also need a small plastic snake and a big toy frog for the kids.  She can scoop these things into three red bags, and we will go meet her Wednesday at the train station."</p>
+          </p>
+        <form style='margin-top:20px' enctype="multipart/form-data" action='/'>
+        <button type="submit">Upload a new file!</button>
+        </form>
+
+        </div>
+
+        <div id='right'>
+          <div id='results'>
+              <h2>Your Accent Is:</h2>
+          </div>
+          <div id='waveform'></div>
+          <div id='buttons'>
+            <button onclick=wavesurfer.play()>Play!</button>
+            <button onclick=wavesurfer.pause()>Pause</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+    <!-- ends second section -->
+
+    <!-- <main class="hoc container clear"> 
+
+      <div class="sectiontitle">
+        <h3 class="heading">Tincidunt phasellus</h3>
+        <p>Non risus leo sed eget lobortis risus mauris blandit maximus.</p>
+      </div>
+
+      <p class="btmspace-50 justified">Enim neque nec placerat risus suscipit vitae volutpat nisi sit amet turpis molestie ut sodales nisi efficitur duis id ex eros vivamus ac vehicula nibh non luctus ipsum suspendisse dolor metus varius in facilisis vitae euismod nec ex donec ullamcorper eros vel molestie sagittis libero augue elementum libero cursus euismod sem leo sed augue praesent condimentum odio sit amet nulla tempor sollicitudin lacinia mauris vestibulum cras euismod accumsan dolor et convallis praesent porttitor maximus viverra proin fermentum scelerisque neque quis consequat mauris rutrum eget proin fringilla nisi libero in tincidunt tortor porttitor sed phasellus vitae molestie massa suspendisse.</p>
+
+    </main> -->
+  </div>
+  <script src="/static/jquery.min.js"></script>
+  <script src="/static/jquery.flexslider-min.js"></script>
+  <script>
+    var results = document.querySelector('#results')
+    fetch('/predict').then(function (read) {
+        return read.json();
+    })
+    .then(function (data) {
+        wavesurfer.load(data['filepath'])
+        for (var key in data['results']) {
+            var res = document.createElement('p')
+            res.innerHTML = key + ': ' + data['results'][key]
+            results.appendChild(res)
+        }
+
+    })
+    
+    var wavesurfer = WaveSurfer.create({
+                        container: '#waveform',
+                        barWidth: 2,
+                        barHeight: 1,
+                        waveColor: 'gray',
+                        progressColor: 'orangered',
+                        scrollParent: true,
+                    });
+    </script>
+</body>
+</html>
